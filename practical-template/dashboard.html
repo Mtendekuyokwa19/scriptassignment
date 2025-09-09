@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./css/site.css" />
+    <link rel="stylesheet" href="./dash.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="toggle">
+        <a id="toggle-nav"><i class="fa fa-navicon cog"></i></a>
+      </div>
+    </div>
+    <div class="container">
+      <div class="sidebar" id="sidebar">
+        <a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a>
+        <a href="form.html"><i class="fa fa-shopping-cart"></i> Forms</a>
+        <a href="tables.html"><i class="fa fa-shopping-bag"></i> Tables</a>
+      </div>
+      <div class="content">
+        <div class="summary-container">
+          <div class="summary">
+            <div class="summary-icon"><i class="fa fa-users"></i></div>
+            <div class="summary-content">
+              <div class="summary-heading">Users</div>
+              <div><h2>0</h2></div>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="summary-icon"><i class="fa fa-signal"></i></div>
+            <div class="summary-content">
+              <div class="summary-heading">Products</div>
+              <div><h2>0</h2></div>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="summary-icon"><i class="fa fa-shopping-cart"></i></div>
+            <div class="summary-content">
+              <div class="summary-heading">Sales</div>
+              <div><h2>0</h2></div>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="summary-icon"><i class="fa fa-line-chart"></i></div>
+            <div class="summary-content">
+              <div class="summary-heading">Profit</div>
+              <div><h2>0</h2></div>
+            </div>
+          </div>
+        </div>
+        <div class="charts-container">
+          <!-- This is the chart content section-->
+        </div>
+      </div>
+    </div>
+    <section class="canvasofchars">
+      <div id="sale-trend-container">
+        <h5>Sale Trend</h5>
+
+        <canvas id="sale-trend"></canvas>
+      </div>
+      <div id="site-visitors">
+        <h5>visitors-trend</h5>
+        <canvas id="visitors-trend"></canvas>
+      </div>
+      <div id="categories">
+        <h5>categories-trend</h5>
+        <canvas id="categories-trend"></canvas>
+      </div>
+      <div id="products">
+        <h5>product-trend</h5>
+        <canvas id="product-trend"></canvas>
+      </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.min.js"
+      integrity="sha512-n/G+dROKbKL3GVngGWmWfwK0yPctjZQM752diVYnXZtD/48agpUKLIn0xDQL9ydZ91x6BiOmTIFwWjjFi2kEFg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      $(document).ready(function () {
+        async function PieChartData() {
+          const data = await fetch(" http://localhost:3000/sold_products ");
+          return data.json();
+        }
+
+        async function BarChartData() {
+          const data = await fetch(" http://localhost:3000/top_products");
+          return data.json();
+        }
+        async function LineChartData() {
+          const data = await fetch(" http://localhost:3000/visitors");
+          return data.json();
+        }
+        async function ScatterChartData() {
+          const data = await fetch(" http://localhost:3000/sales");
+          return data.json();
+        }
+
+        function BarChartDataOutput() {
+          let productTrend = document.querySelector("#product-trend");
+          BarChartData().then((dataBar) => {
+            (async function () {
+              const data = dataBar.product;
+              new Chart(document.getElementById("product-trend"), {
+                type: "bar",
+                data: {
+                  labels: dataBar.product,
+                  datasets: [
+                    {
+                      label: "Best selling product",
+                      data: dataBar.count,
+                    },
+                  ],
+                },
+              });
+            })();
+          });
+        }
+
+        function ScatterDataOutput() {
+          ScatterChartData().then((dataScatter) => {
+            var chrt = document.getElementById("sale-trend").getContext("2d");
+            (async function () {
+              const data = dataScatter;
+              var chartId = new Chart(chrt, {
+                type: "scatter",
+                data: {
+                  datasets: [
+                    {
+                      label: "sales in the past 10 days",
+                      data: dataScatter,
+                      backgroundColor: [
+                        "yellow",
+                        "aqua",
+                        "pink",
+                        "lightgreen",
+                        "gold",
+                        "lightblue",
+                      ],
+                      borderColor: ["black"],
+                      radius: 8,
+                    },
+                  ],
+                },
+                options: {
+                  responsive: false,
+                  scales: {
+                    x: {
+                      type: "linear",
+                      position: "bottom,",
+                    },
+                  },
+                },
+              });
+            })();
+          });
+        }
+        function LineChartDataOutput() {
+          LineChartData().then((dataLine) => {
+            (async function () {
+              const data = dataLine.product;
+              new Chart(document.getElementById("visitors-trend"), {
+                type: "line",
+                data: {
+                  labels: dataLine.day,
+                  datasets: [
+                    {
+                      label: "Best selling product",
+                      data: dataLine.count,
+                    },
+                  ],
+                },
+              });
+            })();
+          });
+        }
+        function PieDataOutput() {
+          PieChartData().then((dataPie) => {
+            (async function () {
+              const data = dataPie.product;
+              new Chart(document.getElementById("categories-trend"), {
+                type: "pie",
+                data: {
+                  labels: dataPie.category,
+                  datasets: [
+                    {
+                      label: "Best selling product",
+                      data: dataPie.count,
+                    },
+                  ],
+                },
+              });
+            })();
+          });
+        }
+        BarChartDataOutput();
+        PieDataOutput();
+        LineChartDataOutput();
+        ScatterDataOutput();
+      });
+    </script>
+  </body>
+</html>
