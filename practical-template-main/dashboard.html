@@ -9,6 +9,7 @@
     />
     <title>Dashboard</title>
     <link rel="stylesheet" href="./css/site.css" />
+    <script src="./dash.js"defer ></script>
   </head>
   <body>
     <div class="header">
@@ -28,33 +29,32 @@
             <div class="summary-icon"><i class="fa fa-users"></i></div>
             <div class="summary-content">
               <div class="summary-heading">Users</div>
-              <div><h2>0</h2></div>
+              <div><h2 class="userstab">0</h2></div>
             </div>
           </div>
           <div class="summary">
             <div class="summary-icon"><i class="fa fa-signal"></i></div>
             <div class="summary-content">
               <div class="summary-heading">Products</div>
-              <div><h2>0</h2></div>
+              <div><h2 class="Products">0</h2></div>
             </div>
           </div>
           <div class="summary">
             <div class="summary-icon"><i class="fa fa-shopping-cart"></i></div>
             <div class="summary-content">
               <div class="summary-heading">Sales</div>
-              <div><h2>0</h2></div>
+              <div><h2 class="Sales">0</h2></div>
             </div>
           </div>
           <div class="summary">
             <div class="summary-icon"><i class="fa fa-line-chart"></i></div>
             <div class="summary-content">
               <div class="summary-heading">Profit</div>
-              <div><h2>0</h2></div>
+              <div><h2 class="user2">0</h2></div>
             </div>
           </div>
         </div>
         <div class="charts-container">
-          
           <!-- This is the chart content section-->
           <h4>Implement here..</h4>
         </div>
@@ -63,14 +63,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      $(document).ready(function () {
-        $('#toggle-nav').on('click', function (e) {
-          e.preventDefault();
-          $('#sidebar').toggleClass('show');
-        });
+      $("document").ready(() => {
+        // Your js here
       });
-      
-
     </script>
   </body>
 </html>
