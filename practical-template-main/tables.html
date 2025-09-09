@@ -10,11 +10,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./css/site.css" />
     <title>Table</title>
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+      .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+      }
+      .modal-buttons button {
+        margin: 10px;
+        padding: 10px 20px;
+      }
+    </style>
   </head>
   <body>
     <div class="header">
@@ -32,20 +57,117 @@
         <div class="left">
           <h3>Product Records</h3>
           <div class="section-container">
-            <div class="section-header">Details of avalialble products</div>
+            <div class="section-header">Details of available products</div>
             <div class="section-content">
-              <!-- section content-->
-              <h4>Implement here..</h4>
+              <div id="loader" class="loader"></div>
+              <table id="productTable">
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
             </div>
           </div>
         </div>
         <div class="right"></div>
       </div>
     </div>
+    <div id="deleteModal" class="modal">
+      <div class="modal-content">
+        <p>Are you sure you want to delete this product?</p>
+        <div class="modal-buttons">
+          <button id="confirmDelete">Yes</button>
+          <button id="cancelDelete">No</button>
+        </div>
+      </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      $("document").ready(() => {
-        //
+     
+
+      $(document).ready(() => {
+        const loader = $("#loader");
+        const tableBody = $("#tableBody");
+        const deleteModal = $("#deleteModal");
+        let productToDelete = null;
+
+        loader.show();
+
+        // Simulate loading delay
+        setTimeout(() => {
+          loader.hide();
+
+          
+          $.get("http://localhost:3000/products/", function (data) {
+            data.forEach((product) => {
+
+              tableBody.append(`
+                <tr data-id="${product.id}">
+                  <td>${product.id}</td>
+                  <td>${product.name}</td>
+                  <td>${product.price}</td>
+                  <td>${product.quantity}</td>
+                  <td>${product.description}</td>
+                  <td>
+                    <a href="#" class="edit">Edit</a> |
+                    <a href="#" class="delete">Delete</a>
+                  </td>
+                </tr>
+              `);
+            });
+          }).fail((xhr, status, error) => {
+            alert("Failed to fetch products. Error: " + error);
+            console.error("Fetch error:", status, error);
+          });
+        }, 2000);
+
+        // Use event delegation for dynamically added elements
+        $(document).on("click", ".delete", function (e) {
+          e.preventDefault();
+          const row = $(this).closest("tr");
+          productToDelete = row.data("id");
+      
+          deleteModal.show();
+        });
+
+        $("#confirmDelete").on("click", function () {
+          if (productToDelete) {
+            console.log(`http://localhost:3000/products/${productToDelete}`)
+           
+            $.ajax({
+              url: `http://localhost:3000/products/${productToDelete}`,
+              method: "DELETE",
+              success: function () {
+                $(`tr[data-id="${productToDelete}"]`).remove();
+                deleteModal.hide();
+                console.log("Product deleted successfully");
+              },
+              error: function (xhr, status, error) {
+                alert("Failed to delete product. Error: " + error);
+                console.error("Delete error:", status, error);
+                deleteModal.hide();
+              },
+            });
+          }
+        });
+
+        $("#cancelDelete").on("click", function () {
+          deleteModal.hide();
+        });
+
+        // Hide modal if clicked outside
+        $(window).on("click", function (e) {
+          if (e.target.id === "deleteModal") {
+            deleteModal.hide();
+          }
+        });
       });
     </script>
   </body>
